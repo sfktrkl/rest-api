@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import validator from "validator";
+import slugify from "slugify";
 
 const jobSchema = new mongoose.Schema({
   slug: String,
@@ -90,6 +91,11 @@ const jobSchema = new mongoose.Schema({
     type: [Object],
     select: false,
   },
+});
+
+jobSchema.pre("save", function (next) {
+  this.slug = slugify(this.title, { lower: true });
+  next();
 });
 
 export default mongoose.model("Job", jobSchema);
