@@ -18,3 +18,15 @@ sudo snap install postman
 ```bash
 npm install
 ```
+
+### Run in development mode
+
+```bash
+npm run dev
+```
+
+### Run in production mode
+
+```bash
+npm run prod
+```
