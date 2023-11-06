@@ -1,9 +1,11 @@
 import Job from "../models/jobs.js";
 
-export function getJobs(req, res, next) {
+export async function getJobs(req, res, next) {
+  const jobs = await Job.find();
   res.status(200).json({
     success: true,
-    message: "This route will display jobs.",
+    results: jobs.length,
+    data: jobs,
   });
 }
 
