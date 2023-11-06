@@ -6,3 +6,9 @@
 sudo apt update
 sudo apt install nodejs
 ```
+
+### Install Postman
+
+```bash
+sudo snap install postman
+```
