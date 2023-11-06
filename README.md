@@ -12,3 +12,9 @@ sudo apt install nodejs
 ```bash
 sudo snap install postman
 ```
+
+### Install dependencies
+
+```bash
+npm install
+```
