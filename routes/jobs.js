@@ -1,11 +1,7 @@
 import { Router } from "express";
-const router = Router();
+import { getJobs } from "../controllers/jobs.js";
 
-router.get("/jobs", (req, res) => {
-  res.status(200).json({
-    success: true,
-    message: "This route will display jobs.",
-  });
-});
+const router = Router();
+router.route("/jobs").get(getJobs);
 
 export default router;
