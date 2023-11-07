@@ -68,3 +68,29 @@ export async function updateJob(req, res, next) {
     });
   }
 }
+
+export async function deleteJob(req, res, next) {
+  try {
+    const job = await Job.findByIdAndDelete(req.params.id, {
+      useFindAndModify: false,
+    });
+
+    if (job) {
+      res.status(200).json({
+        success: true,
+        message: "Job deleted",
+        data: job,
+      });
+    } else {
+      res.status(404).json({
+        success: false,
+        message: "Job not found",
+      });
+    }
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Job id is not valid",
+    });
+  }
+}
