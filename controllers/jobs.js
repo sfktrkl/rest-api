@@ -40,3 +40,31 @@ export async function postJobs(req, res, next) {
     data: job,
   });
 }
+
+export async function updateJob(req, res, next) {
+  try {
+    const job = await Job.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true,
+      useFindAndModify: false,
+    });
+
+    if (job) {
+      res.status(200).json({
+        success: true,
+        message: "Job updated",
+        data: job,
+      });
+    } else {
+      res.status(404).json({
+        success: false,
+        message: "Job not found",
+      });
+    }
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Job id is not valid",
+    });
+  }
+}
