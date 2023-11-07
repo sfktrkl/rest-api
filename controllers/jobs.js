@@ -32,6 +32,31 @@ export async function getJobsInRadius(req, res, next) {
   });
 }
 
+export async function getJob(req, res, next) {
+  try {
+    const job = await Job.findOne({
+      _id: req.params.id,
+    });
+
+    if (job) {
+      res.status(200).json({
+        success: true,
+        data: job,
+      });
+    } else {
+      res.status(404).json({
+        success: false,
+        message: "Job not found",
+      });
+    }
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Job id is not valid",
+    });
+  }
+}
+
 export async function postJobs(req, res, next) {
   const job = await Job.create(req.body);
   res.status(201).json({
