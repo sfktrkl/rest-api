@@ -119,3 +119,39 @@ export async function deleteJob(req, res, next) {
     });
   }
 }
+
+export async function jobStats(req, res, next) {
+  try {
+    const stats = await Job.aggregate([
+      {
+        $match: { $text: { $search: '"' + req.params.topic + '"' } },
+      },
+      {
+        $group: {
+          _id: { $toUpper: "$experience" },
+          totalJobs: { $sum: 1 },
+          avgSalary: { $avg: "$salary" },
+          minSalary: { $min: "$salary" },
+          maxSalary: { $max: "$salary" },
+        },
+      },
+    ]);
+
+    if (stats && stats.length > 0) {
+      res.status(200).json({
+        success: true,
+        data: stats,
+      });
+    } else {
+      res.status(404).json({
+        success: false,
+        message: `No stats found for ${req.params.topic}`,
+      });
+    }
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "An error occurred while fetching job statistics",
+    });
+  }
+}
