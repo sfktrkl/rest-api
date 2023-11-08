@@ -12,6 +12,7 @@ import { connectDatabase } from "./database/database.js";
 connectDatabase();
 
 import { errorMiddleware } from "./middlewares/errors.js";
+import { ErrorHandler } from "./utils/errorHandler.js";
 
 import jobs from "./routes/jobs.js";
 
@@ -20,6 +21,9 @@ const PORT = process.env.PORT;
 
 app.use(express.json());
 app.use("/api/v1", jobs);
+app.all("*", (req, res, next) => {
+  next(new ErrorHandler(`${req.originalUrl} route not found`, 404));
+});
 app.use(errorMiddleware);
 const server = app.listen(PORT, () => {
   console.log(
