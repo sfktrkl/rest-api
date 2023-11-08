@@ -6,7 +6,7 @@ export class Filters {
 
   filter() {
     const queryCopy = { ...this.queryStr };
-    const removeFields = ["sort", "fields", "search"];
+    const removeFields = ["sort", "fields", "search", "page", "limit"];
     removeFields.forEach((el) => delete queryCopy[el]);
 
     let queryStr = JSON.stringify(queryCopy);
@@ -42,6 +42,16 @@ export class Filters {
       const search = this.queryStr.search.split("-").join(" ");
       this.query = this.query.find({ $text: { $search: '"' + search + '"' } });
     }
+
+    return this;
+  }
+
+  pagination() {
+    const page = parseInt(this.queryStr.page, 10) || 1;
+    const limit = parseInt(this.queryStr.limit, 10) || 5;
+    const skipResults = (page - 1) * limit;
+
+    this.query = this.query.skip(skipResults).limit(limit);
 
     return this;
   }

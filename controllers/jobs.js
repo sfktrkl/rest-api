@@ -10,7 +10,8 @@ export const getJobs = catchErrors(async (req, res, next) => {
     .filter()
     .sort()
     .fields()
-    .search();
+    .search()
+    .pagination();
   const jobs = await filters.query;
   res.status(200).json({
     success: true,
