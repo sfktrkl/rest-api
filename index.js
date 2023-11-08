@@ -15,8 +15,16 @@ const PORT = process.env.PORT;
 app.use(express.json());
 app.use("/api/v1", jobs);
 app.use(errorMiddleware);
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(
     `Server started on port ${PORT} in ${process.env.NODE_ENV} mode.`
   );
+});
+
+process.on("unhandledRejection", (err) => {
+  console.log(`Error: ${err.message}`);
+  console.log("Shutdown server due to unhandled promise rejection.");
+  server.close(() => {
+    process.exit(1);
+  });
 });
