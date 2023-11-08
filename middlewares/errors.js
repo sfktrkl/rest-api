@@ -1,3 +1,5 @@
+import { ErrorHandler } from "../utils/errorHandler.js";
+
 export function errorMiddleware(err, req, res, next) {
   err.statusCode = err.statusCode || 500;
 
@@ -9,9 +11,20 @@ export function errorMiddleware(err, req, res, next) {
       stack: err.stack,
     });
   } else if (process.env.NODE_ENV === "production") {
-    res.status(err.statusCode).json({
+    let error = { ...err };
+    error.message = err.message;
+    if (err.name === "CastError")
+      error = new ErrorHandler(`Resource not found. Invalid: ${err.path}`, 404);
+    else if (err.name === "ValidationError")
+      error = new ErrorHandler(
+        Object.values(err.errors)
+          .map((e) => e.message)
+          .join(" "),
+        400
+      );
+    res.status(error.statusCode).json({
       success: false,
-      message: err.message || "Internal server error",
+      message: error.message || "Internal server error",
     });
   }
 }
