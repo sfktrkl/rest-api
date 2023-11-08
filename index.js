@@ -2,6 +2,12 @@ import express from "express";
 import dotenv from "dotenv";
 dotenv.config({ path: ".env" });
 
+process.on("uncaughtException", (err) => {
+  console.log(`Error: ${err.message}`);
+  console.log("Shutdown server due to uncaught exception.");
+  process.exit(1);
+});
+
 import { connectDatabase } from "./database/database.js";
 connectDatabase();
 
