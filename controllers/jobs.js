@@ -1,11 +1,13 @@
 import Job from "../models/jobs.js";
 import geocoder from "../utils/geocoder.js";
+import { Filters } from "../utils/filters.js";
 import { ErrorHandler, catchErrors } from "../utils/errorHandler.js";
 
 const EARTH_RADIUS_KM = 6371;
 
 export const getJobs = catchErrors(async (req, res, next) => {
-  const jobs = await Job.find();
+  const filters = new Filters(Job.find(), req.query).filter();
+  const jobs = await filters.query;
   res.status(200).json({
     success: true,
     results: jobs.length,
