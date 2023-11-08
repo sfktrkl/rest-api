@@ -5,3 +5,9 @@ export class ErrorHandler extends Error {
     Error.captureStackTrace(this, this.constructor);
   }
 }
+
+export function catchErrors(func) {
+  return function (req, res, next) {
+    Promise.resolve(func(req, res, next)).catch(next);
+  };
+}
