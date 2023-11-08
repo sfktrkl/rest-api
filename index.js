@@ -5,6 +5,8 @@ dotenv.config({ path: ".env" });
 import { connectDatabase } from "./database/database.js";
 connectDatabase();
 
+import { errorMiddleware } from "./middlewares/errors.js";
+
 import jobs from "./routes/jobs.js";
 
 const app = express();
@@ -12,6 +14,7 @@ const PORT = process.env.PORT;
 
 app.use(express.json());
 app.use("/api/v1", jobs);
+app.use(errorMiddleware);
 app.listen(PORT, () => {
   console.log(
     `Server started on port ${PORT} in ${process.env.NODE_ENV} mode.`

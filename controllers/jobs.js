@@ -1,5 +1,6 @@
 import Job from "../models/jobs.js";
 import geocoder from "../utils/geocoder.js";
+import { ErrorHandler } from "../utils/errorHandler.js";
 
 const EARTH_RADIUS_KM = 6371;
 
@@ -43,12 +44,7 @@ export async function getJob(req, res, next) {
         success: true,
         data: job,
       });
-    } else {
-      res.status(404).json({
-        success: false,
-        message: "Job not found",
-      });
-    }
+    } else return next(new ErrorHandler("Job not found", 404));
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -80,12 +76,7 @@ export async function updateJob(req, res, next) {
         message: "Job updated",
         data: job,
       });
-    } else {
-      res.status(404).json({
-        success: false,
-        message: "Job not found",
-      });
-    }
+    } else return next(new ErrorHandler("Job not found", 404));
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -106,12 +97,7 @@ export async function deleteJob(req, res, next) {
         message: "Job deleted",
         data: job,
       });
-    } else {
-      res.status(404).json({
-        success: false,
-        message: "Job not found",
-      });
-    }
+    } else return next(new ErrorHandler("Job not found", 404));
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -142,12 +128,10 @@ export async function jobStats(req, res, next) {
         success: true,
         data: stats,
       });
-    } else {
-      res.status(404).json({
-        success: false,
-        message: `No stats found for ${req.params.topic}`,
-      });
-    }
+    } else
+      return next(
+        new ErrorHandler(`No stats found for ${req.params.topic}`, 404)
+      );
   } catch (error) {
     res.status(500).json({
       success: false,
