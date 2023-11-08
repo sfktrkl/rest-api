@@ -6,7 +6,7 @@ import { ErrorHandler, catchErrors } from "../utils/errorHandler.js";
 const EARTH_RADIUS_KM = 6371;
 
 export const getJobs = catchErrors(async (req, res, next) => {
-  const filters = new Filters(Job.find(), req.query).filter();
+  const filters = new Filters(Job.find(), req.query).filter().sort();
   const jobs = await filters.query;
   res.status(200).json({
     success: true,
