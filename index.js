@@ -15,12 +15,14 @@ import { errorMiddleware } from "./middlewares/errors.js";
 import { ErrorHandler } from "./utils/errorHandler.js";
 
 import jobs from "./routes/jobs.js";
+import users from "./routes/users.js";
 
 const app = express();
 const PORT = process.env.PORT;
 
 app.use(express.json());
 app.use("/api/v1", jobs);
+app.use("/api/v1", users);
 app.all("*", (req, res, next) => {
   next(new ErrorHandler(`${req.originalUrl} route not found`, 404));
 });

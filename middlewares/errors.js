@@ -22,6 +22,8 @@ export function errorMiddleware(err, req, res, next) {
           .join(" "),
         400
       );
+    else if (err.code === 11000)
+      error = new ErrorHandler(`Duplicate ${Object.keys(err.keyValue)}.`, 400);
     res.status(error.statusCode).json({
       success: false,
       message: error.message || "Internal server error",
