@@ -9,9 +9,11 @@ export const registerUser = catchErrors(async (req, res, next) => {
     password,
     role,
   });
+
+  const token = user.getJWTToken();
   res.status(201).json({
     success: true,
     message: "User created",
-    data: user,
+    token,
   });
 });
