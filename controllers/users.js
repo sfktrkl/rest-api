@@ -1,4 +1,5 @@
 import User from "../models/users.js";
+import { sendToken } from "../utils/jwtToken.js";
 import { ErrorHandler, catchErrors } from "../utils/errorHandler.js";
 
 export const registerUser = catchErrors(async (req, res, next) => {
@@ -10,12 +11,7 @@ export const registerUser = catchErrors(async (req, res, next) => {
     role,
   });
 
-  const token = user.getJWTToken();
-  res.status(201).json({
-    success: true,
-    message: "User created",
-    token,
-  });
+  sendToken(user, 200, res);
 });
 
 export const loginUser = catchErrors(async (req, res, next) => {
@@ -30,10 +26,5 @@ export const loginUser = catchErrors(async (req, res, next) => {
   const isMatch = await user.comparePassword(password);
   if (!isMatch) return next(new ErrorHandler("Wrong password.", 401));
 
-  const token = user.getJWTToken();
-  res.status(200).json({
-    success: true,
-    message: "Logged in",
-    token,
-  });
+  sendToken(user, 200, res);
 });

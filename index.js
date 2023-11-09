@@ -1,6 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 dotenv.config({ path: ".env" });
+import cookieParser from "cookie-parser";
 
 process.on("uncaughtException", (err) => {
   console.log(`Error: ${err.message}`);
@@ -21,6 +22,7 @@ const app = express();
 const PORT = process.env.PORT;
 
 app.use(express.json());
+app.use(cookieParser());
 app.use("/api/v1", jobs);
 app.use("/api/v1", users);
 app.all("*", (req, res, next) => {
