@@ -1,4 +1,5 @@
 import User from "../models/users.js";
+import { sendEmail } from "../utils/email.js";
 import { sendToken } from "../utils/jwtToken.js";
 import { ErrorHandler, catchErrors } from "../utils/errorHandler.js";
 
@@ -27,4 +28,34 @@ export const loginUser = catchErrors(async (req, res, next) => {
   if (!isMatch) return next(new ErrorHandler("Wrong password.", 401));
 
   sendToken(user, 200, res);
+});
+
+export const forgotPassword = catchErrors(async (req, res, next) => {
+  const email = req.body.email;
+  if (!email) return next(new ErrorHandler("Enter email address.", 400));
+
+  const user = await User.findOne({ email: req.body.email });
+  if (!user) return next(new ErrorHandler("User not found.", 404));
+
+  const token = user.getResetPasswordToken();
+  await user.save({ validateBeforeSave: false });
+
+  try {
+    await sendEmail({
+      email: user.email,
+      subject: `rest-api password recovery`,
+      message: `Your password recovery link:\n\n
+        ${req.protocol}://${req.get("host")}/api/v1/password/reset/${token}`,
+    });
+
+    res.status(200).json({
+      success: true,
+      message: `Email sent successfully to ${user.email}`,
+    });
+  } catch (error) {
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpire = undefined;
+    await user.save({ validateBeforeSave: false });
+    return next(new ErrorHandler("Email can not be sent."), 500);
+  }
 });
