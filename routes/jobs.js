@@ -3,7 +3,7 @@ import {
   getJobs,
   getJobsInRadius,
   getJob,
-  postJobs,
+  postJob,
   updateJob,
   deleteJob,
   jobStats,
@@ -21,11 +21,7 @@ router
 router.route("/jobs/:id").get(authenticationMiddleware, getJob);
 router
   .route("/jobs")
-  .post(
-    authenticationMiddleware,
-    authorizationMiddleware("employer"),
-    postJobs
-  );
+  .post(authenticationMiddleware, authorizationMiddleware("employer"), postJob);
 router
   .route("/jobs/:id")
   .put(authenticationMiddleware, authorizationMiddleware("employer"), updateJob)

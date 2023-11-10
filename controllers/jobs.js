@@ -53,7 +53,8 @@ export const getJob = catchErrors(async (req, res, next) => {
   } else next(new ErrorHandler("Job not found", 404));
 });
 
-export const postJobs = catchErrors(async (req, res, next) => {
+export const postJob = catchErrors(async (req, res, next) => {
+  req.body.user = req.user.id;
   const job = await Job.create(req.body);
   res.status(201).json({
     success: true,
