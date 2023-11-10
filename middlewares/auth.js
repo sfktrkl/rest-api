@@ -18,3 +18,17 @@ export const authenticationMiddleware = catchErrors(async (req, res, next) => {
 
   next();
 });
+
+export function authorizationMiddleware(...roles) {
+  return catchErrors(async (req, res, next) => {
+    if (!roles.includes(req.user.role)) {
+      return next(
+        new ErrorHandler(
+          `Role(${req.user.role}) is not allowed to access this resource.`,
+          403
+        )
+      );
+    }
+    next();
+  });
+}
