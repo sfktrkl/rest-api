@@ -1,5 +1,71 @@
 import { ErrorHandler } from "../utils/errorHandler.js";
 
+const errors = {
+  CastError: {
+    default: {
+      statusCode: 404,
+      message: (err) => {
+        return `Resource not found. Invalid: ${err.path}`;
+      },
+    },
+  },
+  ValidationError: {
+    default: {
+      statusCode: 400,
+      message: (err) => {
+        return Object.values(err.errors)
+          .map((e) => e.message)
+          .join(" ");
+      },
+    },
+  },
+  MongoServerError: {
+    11000: {
+      statusCode: 400,
+      message: (err) => {
+        return `Duplicate ${Object.keys(err.keyValue)}.`;
+      },
+    },
+    default: {
+      statusCode: 500,
+      message: (err) => {
+        return `Mongo server errror.`;
+      },
+    },
+  },
+  JsonWebTokenError: {
+    default: {
+      statusCode: 500,
+      message: (err) => {
+        return "JSON Web token is invalid.";
+      },
+    },
+  },
+  TokenExpiredError: {
+    default: {
+      statusCode: 500,
+      message: (err) => {
+        return "JSON Web token is expired.";
+      },
+    },
+  },
+};
+
+function createError(err) {
+  if (errors.hasOwnProperty(err.name)) {
+    let { statusCode, message } = errors[err.name]["default"];
+    if (errors[err.name].hasOwnProperty(err.code)) {
+      statusCode = errors[err.name][err.code].statusCode;
+      message = errors[err.name][err.code].message;
+    }
+    return new ErrorHandler(message(err), statusCode);
+  }
+  return new ErrorHandler(
+    err.message || "Internal server error",
+    err.statusCode
+  );
+}
+
 export function errorMiddleware(err, req, res, next) {
   err.statusCode = err.statusCode || 500;
 
@@ -11,22 +77,10 @@ export function errorMiddleware(err, req, res, next) {
       stack: err.stack,
     });
   } else if (process.env.NODE_ENV === "production") {
-    let error = { ...err };
-    error.message = err.message;
-    if (err.name === "CastError")
-      error = new ErrorHandler(`Resource not found. Invalid: ${err.path}`, 404);
-    else if (err.name === "ValidationError")
-      error = new ErrorHandler(
-        Object.values(err.errors)
-          .map((e) => e.message)
-          .join(" "),
-        400
-      );
-    else if (err.code === 11000)
-      error = new ErrorHandler(`Duplicate ${Object.keys(err.keyValue)}.`, 400);
+    const error = createError(err);
     res.status(error.statusCode).json({
       success: false,
-      message: error.message || "Internal server error",
+      message: error.message,
     });
   }
 }
