@@ -10,7 +10,7 @@ export const authenticationMiddleware = catchErrors(async (req, res, next) => {
   )
     token = req.headers.authorization.split(" ")[1];
 
-  if (!token)
+  if (!token || token === "null")
     return next(new ErrorHandler("Login to access this resource.", 401));
 
   const decoded = jwt.verify(token, process.env.JWT_SECRET);
