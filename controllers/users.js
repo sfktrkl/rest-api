@@ -1,3 +1,4 @@
+import crypto from "crypto";
 import User from "../models/users.js";
 import { sendEmail } from "../utils/email.js";
 import { sendToken } from "../utils/jwtToken.js";
@@ -58,4 +59,24 @@ export const forgotPassword = catchErrors(async (req, res, next) => {
     await user.save({ validateBeforeSave: false });
     return next(new ErrorHandler("Email can not be sent."), 500);
   }
+});
+
+export const resetPassword = catchErrors(async (req, res, next) => {
+  const resetPasswordToken = crypto
+    .createHash("sha256")
+    .update(req.params.token)
+    .digest("hex");
+
+  const user = await User.findOne({
+    resetPasswordToken,
+    resetPasswordExpire: { $gt: Date.now() },
+  });
+  if (!user) return next(new ErrorHandler("Token is invalid.", 400));
+
+  user.password = req.body.password;
+  user.resetPasswordToken = undefined;
+  user.resetPasswordExpire = undefined;
+  await user.save();
+
+  sendToken(user, 200, res);
 });
