@@ -88,3 +88,15 @@ export const deleteUser = catchErrors(async (req, res, next) => {
     message: "Account has been deleted.",
   });
 });
+
+export const getAppliedJobs = catchErrors(async (req, res, next) => {
+  const jobs = await Job.find({ "applicantsApplied.id": req.user.id }).select(
+    "+applicantsApplied"
+  );
+
+  res.status(200).json({
+    success: true,
+    results: jobs.length,
+    data: jobs,
+  });
+});
