@@ -100,3 +100,13 @@ export const getAppliedJobs = catchErrors(async (req, res, next) => {
     data: jobs,
   });
 });
+
+export const getPublishedJobs = catchErrors(async (req, res, next) => {
+  const jobs = await Job.find({ user: req.user.id });
+
+  res.status(200).json({
+    success: true,
+    results: jobs.length,
+    data: jobs,
+  });
+});

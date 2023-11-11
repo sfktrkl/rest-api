@@ -5,6 +5,7 @@ import {
   updateUser,
   deleteUser,
   getAppliedJobs,
+  getPublishedJobs,
 } from "../controllers/profile.js";
 import {
   authenticationMiddleware,
@@ -22,6 +23,13 @@ router
     authenticationMiddleware,
     authorizationMiddleware("user"),
     getAppliedJobs
+  );
+router
+  .route("/me/published")
+  .get(
+    authenticationMiddleware,
+    authorizationMiddleware("employer"),
+    getPublishedJobs
   );
 
 export default router;
