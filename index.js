@@ -1,4 +1,5 @@
 import express from "express";
+import fileUpload from "express-fileupload";
 import dotenv from "dotenv";
 dotenv.config({ path: ".env" });
 import cookieParser from "cookie-parser";
@@ -24,6 +25,7 @@ const PORT = process.env.PORT;
 
 app.use(express.json());
 app.use(cookieParser());
+app.use(fileUpload());
 app.use("/api/v1", jobs);
 app.use("/api/v1", users);
 app.use("/api/v1", profile);

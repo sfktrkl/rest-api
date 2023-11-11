@@ -7,6 +7,7 @@ import {
   updateJob,
   deleteJob,
   jobStats,
+  applyJob,
 } from "../controllers/jobs.js";
 import {
   authenticationMiddleware,
@@ -30,6 +31,9 @@ router
     authorizationMiddleware("employer"),
     deleteJob
   );
+router
+  .route("/jobs/:id/apply")
+  .put(authenticationMiddleware, authorizationMiddleware("user"), applyJob);
 router.route("/stats/:topic").get(authenticationMiddleware, jobStats);
 
 export default router;

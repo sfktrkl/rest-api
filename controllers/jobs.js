@@ -1,3 +1,4 @@
+import path from "path";
 import Job from "../models/jobs.js";
 import geocoder from "../utils/geocoder.js";
 import { Filters } from "../utils/filters.js";
@@ -115,4 +116,55 @@ export const jobStats = catchErrors(async (req, res, next) => {
       data: stats,
     });
   } else next(new ErrorHandler(`No stats found for ${req.params.topic}`, 404));
+});
+
+export const applyJob = catchErrors(async (req, res, next) => {
+  let job = await Job.findById(req.params.id).select("+applicantsApplied");
+  if (!job) return next(new ErrorHandler("Job not found", 404));
+
+  if (job.lastDate < new Date(Date.now()))
+    return next(new ErrorHandler("Can not apply. Date is over", 400));
+  for (let applicant of job.applicantsApplied) {
+    if (applicant.id === req.user.id)
+      return next(new ErrorHandler("Already applied for this job.", 400));
+  }
+
+  if (!req.files) return next(new ErrorHandler("Upload file", 400));
+
+  const file = req.files.file;
+  const supportedFiles = /.docx|.pdf/;
+  if (!supportedFiles.test(path.extname(file.name)))
+    return next(new ErrorHandler("Upload document file", 400));
+  if (file.size > process.env.MAX_FILE_SIZE)
+    return next(new ErrorHandler("Upload file less than 2MB", 400));
+
+  const extension = path.parse(file.name).ext;
+  file.name = `${req.user.name.replace(" ", "_")}_${job._id}${extension}`;
+
+  file.mv(`${process.env.UPLOAD_PATH}/${file.name}`, async (err) => {
+    if (err) return next(new ErrorHandler("Upload failed", 500));
+
+    await Job.findByIdAndUpdate(
+      req.params.id,
+      {
+        $push: {
+          applicantsApplied: {
+            id: req.user.id,
+            resume: file.name,
+          },
+        },
+      },
+      {
+        new: true,
+        runValidators: true,
+        useFindAndModify: false,
+      }
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "Applied to Job",
+      data: file.name,
+    });
+  });
 });
