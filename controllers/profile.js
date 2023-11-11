@@ -3,7 +3,10 @@ import { sendToken } from "../utils/jwtToken.js";
 import { ErrorHandler, catchErrors } from "../utils/errorHandler.js";
 
 export const getUserProfile = catchErrors(async (req, res, next) => {
-  const user = await User.findById(req.user.id);
+  const user = await User.findById(req.user.id).populate({
+    path: "jobsPublished",
+    select: "title postingDate",
+  });
 
   res.status(200).json({
     success: true,

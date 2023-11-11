@@ -4,38 +4,44 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
 
-const userSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: [true, "Enter your name."],
-  },
-  email: {
-    type: String,
-    required: [true, "Enter your email address."],
-    unique: true,
-    validate: [validator.isEmail, "Enter a valid email address."],
-  },
-  role: {
-    type: String,
-    enum: {
-      values: ["user", "employer"],
-      message: "Please select correct options.",
+const userSchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: [true, "Enter your name."],
     },
-    default: "user",
+    email: {
+      type: String,
+      required: [true, "Enter your email address."],
+      unique: true,
+      validate: [validator.isEmail, "Enter a valid email address."],
+    },
+    role: {
+      type: String,
+      enum: {
+        values: ["user", "employer"],
+        message: "Please select correct options.",
+      },
+      default: "user",
+    },
+    password: {
+      type: String,
+      required: [true, "Enter a password."],
+      minlength: [8, "Password must be at least 8 characters."],
+      select: false,
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now,
+    },
+    resetPasswordToken: String,
+    resetPasswordExpire: Date,
   },
-  password: {
-    type: String,
-    required: [true, "Enter a password."],
-    minlength: [8, "Password must be at least 8 characters."],
-    select: false,
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
-  resetPasswordToken: String,
-  resetPasswordExpire: Date,
-});
+  {
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
+  }
+);
 
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) next();
@@ -61,5 +67,12 @@ userSchema.methods.getResetPasswordToken = function () {
   this.resetPasswordExpire = Date.now() + 30 * 60 * 1000;
   return resetToken;
 };
+
+userSchema.virtual("jobsPublished", {
+  ref: "Job",
+  localField: "_id",
+  foreignField: "user",
+  justOne: false,
+});
 
 export default mongoose.model("User", userSchema);
