@@ -71,6 +71,9 @@ export const updateJob = catchErrors(async (req, res, next) => {
     useFindAndModify: false,
   });
 
+  if (job.user.toString() !== req.user.id && req.user.role !== "admin")
+    return next(new ErrorHandler(`Not allowed to update this job.`));
+
   if (job) {
     res.status(200).json({
       success: true,
@@ -81,9 +84,19 @@ export const updateJob = catchErrors(async (req, res, next) => {
 });
 
 export const deleteJob = catchErrors(async (req, res, next) => {
-  const job = await Job.findByIdAndDelete(req.params.id, {
-    useFindAndModify: false,
-  });
+  let job = await Job.findById(req.params.id).select("+applicantsApplied");
+  if (!job) return next(new ErrorHandler("Job not found", 404));
+  await Job.findByIdAndDelete(req.params.id, { useFindAndModify: false });
+
+  if (job.user.toString() !== req.user.id && req.user.role !== "admin")
+    return next(new ErrorHandler(`Not allowed to update this job.`));
+
+  for (let applicant of job.applicantsApplied) {
+    let filepath = `${process.env.UPLOAD_PATH}/${applicant.resume}`;
+    fs.unlink(filepath, (err) => {
+      if (err) return console.log(err);
+    });
+  }
 
   if (job) {
     res.status(200).json({
