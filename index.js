@@ -1,4 +1,5 @@
 import express from "express";
+import rateLimit from "express-rate-limit";
 import fileUpload from "express-fileupload";
 import dotenv from "dotenv";
 dotenv.config({ path: ".env" });
@@ -26,6 +27,12 @@ const PORT = process.env.PORT;
 app.use(express.json());
 app.use(cookieParser());
 app.use(fileUpload());
+app.use(
+  rateLimit({
+    windowMs: 10 * 60 * 1000,
+    max: 100,
+  })
+);
 app.use("/api/v1", jobs);
 app.use("/api/v1", users);
 app.use("/api/v1", profile);
