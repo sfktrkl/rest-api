@@ -22,18 +22,30 @@ router
 router.route("/jobs/:id").get(authenticationMiddleware, getJob);
 router
   .route("/jobs")
-  .post(authenticationMiddleware, authorizationMiddleware("employer"), postJob);
+  .post(
+    authenticationMiddleware,
+    authorizationMiddleware("employer", "admin"),
+    postJob
+  );
 router
   .route("/jobs/:id")
-  .put(authenticationMiddleware, authorizationMiddleware("employer"), updateJob)
+  .put(
+    authenticationMiddleware,
+    authorizationMiddleware("employer", "admin"),
+    updateJob
+  )
   .delete(
     authenticationMiddleware,
-    authorizationMiddleware("employer"),
+    authorizationMiddleware("employer", "admin"),
     deleteJob
   );
 router
   .route("/jobs/:id/apply")
-  .put(authenticationMiddleware, authorizationMiddleware("user"), applyJob);
+  .put(
+    authenticationMiddleware,
+    authorizationMiddleware("user", "admin"),
+    applyJob
+  );
 router.route("/stats/:topic").get(authenticationMiddleware, jobStats);
 
 export default router;

@@ -23,14 +23,14 @@ router
   .route("/me/applied")
   .get(
     authenticationMiddleware,
-    authorizationMiddleware("user"),
+    authorizationMiddleware("user", "admin"),
     getAppliedJobs
   );
 router
   .route("/me/published")
   .get(
     authenticationMiddleware,
-    authorizationMiddleware("employer"),
+    authorizationMiddleware("employer", "admin"),
     getPublishedJobs
   );
 router
