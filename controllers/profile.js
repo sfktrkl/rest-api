@@ -1,6 +1,7 @@
 import fs from "fs";
 import Job from "../models/jobs.js";
 import User from "../models/users.js";
+import { Filters } from "../utils/filters.js";
 import { sendToken } from "../utils/jwtToken.js";
 import { ErrorHandler, catchErrors } from "../utils/errorHandler.js";
 
@@ -108,5 +109,19 @@ export const getPublishedJobs = catchErrors(async (req, res, next) => {
     success: true,
     results: jobs.length,
     data: jobs,
+  });
+});
+
+export const getUsers = catchErrors(async (req, res, next) => {
+  const filters = new Filters(User.find(), req.query)
+    .filter()
+    .sort()
+    .fields()
+    .pagination();
+  const users = await filters.query;
+  res.status(200).json({
+    success: true,
+    results: users.length,
+    data: users,
   });
 });
