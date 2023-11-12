@@ -44,6 +44,9 @@ export const getJobsInRadius = catchErrors(async (req, res, next) => {
 export const getJob = catchErrors(async (req, res, next) => {
   const job = await Job.findOne({
     _id: req.params.id,
+  }).populate({
+    path: "user",
+    select: "name",
   });
 
   if (job) {
