@@ -1,10 +1,12 @@
 import express from "express";
 import rateLimit from "express-rate-limit";
+import mongoSanitize from "express-mongo-sanitize";
 import fileUpload from "express-fileupload";
 import dotenv from "dotenv";
 dotenv.config({ path: ".env" });
 import cookieParser from "cookie-parser";
 import helmet from "helmet";
+import xssClean from "xss-clean";
 
 process.on("uncaughtException", (err) => {
   console.log(`Error: ${err.message}`);
@@ -27,6 +29,8 @@ const PORT = process.env.PORT;
 
 app.use(helmet());
 app.use(express.json());
+app.use(mongoSanitize());
+app.use(xssClean());
 app.use(cookieParser());
 app.use(fileUpload());
 app.use(
