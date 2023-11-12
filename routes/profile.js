@@ -7,6 +7,7 @@ import {
   getAppliedJobs,
   getPublishedJobs,
   getUsers,
+  deleteUserAdmin,
 } from "../controllers/profile.js";
 import {
   authenticationMiddleware,
@@ -35,5 +36,12 @@ router
 router
   .route("/users")
   .get(authenticationMiddleware, authorizationMiddleware("admin"), getUsers);
+router
+  .route("/users/:id")
+  .delete(
+    authenticationMiddleware,
+    authorizationMiddleware("admin"),
+    deleteUserAdmin
+  );
 
 export default router;

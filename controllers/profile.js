@@ -125,3 +125,16 @@ export const getUsers = catchErrors(async (req, res, next) => {
     data: users,
   });
 });
+
+export const deleteUserAdmin = catchErrors(async (req, res, next) => {
+  const user = await User.findById(req.params.id);
+  if (!user) return next(new ErrorHandler(`User not found.`, 404));
+
+  await User.findByIdAndDelete(req.params.id);
+  deleteUserData(user.id, user.role);
+
+  res.status(200).json({
+    success: true,
+    message: "User is deleted by Admin",
+  });
+});
