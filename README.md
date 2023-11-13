@@ -30,3 +30,20 @@ npm run dev
 ```bash
 npm run prod
 ```
+
+### Generate documentation
+
+- Export from postman
+
+- Create documentation using docgen, https://github.com/thedevsaddam/docgen
+
+```bash
+curl https://raw.githubusercontent.com/thedevsaddam/docgen/v3/uninstall.sh -o uninstall.sh \
+&& sudo chmod +x uninstall.sh \
+&& sudo ./uninstall.sh \
+&& rm uninstall.sh
+```
+
+```bash
+docgen build -i collection.json -o index.html
+```

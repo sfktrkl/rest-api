@@ -9,6 +9,7 @@ import helmet from "helmet";
 import xssClean from "xss-clean";
 import hpp from "hpp";
 import cors from "cors";
+import bodyParser from "body-parser";
 
 process.on("uncaughtException", (err) => {
   console.log(`Error: ${err.message}`);
@@ -29,6 +30,8 @@ import profile from "./routes/profile.js";
 const app = express();
 const PORT = process.env.PORT;
 
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.static("public"));
 app.use(helmet());
 app.use(express.json());
 app.use(mongoSanitize());
