@@ -8,6 +8,7 @@ import cookieParser from "cookie-parser";
 import helmet from "helmet";
 import xssClean from "xss-clean";
 import hpp from "hpp";
+import cors from "cors";
 
 process.on("uncaughtException", (err) => {
   console.log(`Error: ${err.message}`);
@@ -45,6 +46,7 @@ app.use(
     max: 100,
   })
 );
+app.use(cors());
 app.use("/api/v1", jobs);
 app.use("/api/v1", users);
 app.use("/api/v1", profile);
