@@ -7,6 +7,7 @@ dotenv.config({ path: ".env" });
 import cookieParser from "cookie-parser";
 import helmet from "helmet";
 import xssClean from "xss-clean";
+import hpp from "hpp";
 
 process.on("uncaughtException", (err) => {
   console.log(`Error: ${err.message}`);
@@ -31,6 +32,11 @@ app.use(helmet());
 app.use(express.json());
 app.use(mongoSanitize());
 app.use(xssClean());
+app.use(
+  hpp({
+    whitelist: ["positions"],
+  })
+);
 app.use(cookieParser());
 app.use(fileUpload());
 app.use(
